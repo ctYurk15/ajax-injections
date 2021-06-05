@@ -1,5 +1,6 @@
 {
-     "name": "ctyurk15/ajax-injections",
+    "name": "ctyurk15/ajax-injections",
+    "version": "1.0.0",
     "description": "Composer package that allows you to access your Database with ajax-requests",
     "license": "proprietary",
     "authors": [

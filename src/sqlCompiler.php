@@ -58,7 +58,7 @@ class SQLCompiler
             //if server returned error
             else
             {
-                $result = $this->conn->error;
+                $result = "Error #".$this->conn->errno." - ".$this->conn->error;
             }
             
         }
