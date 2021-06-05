@@ -1,5 +1,19 @@
 {
+     "name": "ctyurk15/ajax-injections",
+    "description": "Composer package that allows you to access your Database with ajax-requests",
+    "license": "proprietary",
+    "authors": [
+        {
+            "name": "Yurii Hrytsak"
+        }
+    ],
     "require": {
-        "phpunit/phpunit": "^9.5"
+        "php": ">=5.4.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "4.8.9"
+    },
+    "autoload": {
+        "classmap": ["src"]
     }
 }
