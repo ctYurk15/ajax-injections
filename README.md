@@ -5,12 +5,13 @@ Composer package that allows you to access your Database with AJAX-requests. No 
 # Installation
 
 To install this package you need to:
-    1. Install composer
-    2. Go to your directory folder
-    3. Write down next command:
-    ```
-    composer require ctyurk15/ajax-injections
-    ```
+1. Install composer
+2. Go to your directory folder with console
+3. Write down next command:
+```
+composer require ctyurk15/ajax-injections
+```
+
 Done!
 
 # Usage
