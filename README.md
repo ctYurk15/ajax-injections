@@ -25,8 +25,11 @@ Here is simple example for serverside
 //attaching composer`s autoload file
 require __DIR__.'/vendor/autoload.php';
 
+//if you want to restrict some sequences(OPTIONAL)
+$blacklist = ['create database', 'drop', '*', 'id'];
+
 //creating instance of SQLCompiler
-$sqlcompiler =  new SQLCompiler('localhost', 'root', 'root', 'ajax-injections');
+$sqlcompiler =  new SQLCompiler('localhost', 'root', 'root', 'ajax-injections', $blacklist);
 
 //getting query we need to compile
 $query = $_POST["query"];
