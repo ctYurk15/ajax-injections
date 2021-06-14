@@ -8,8 +8,10 @@ class SQLCompiler
     protected $db;
     protected $user;
     protected $pass;
+
+    protected $blacklist = [];
     
-    public function __construct($host, $user, $pass, $db)
+    public function __construct($host, $user, $pass, $db, array $blacklist = [])
     {
         //initializing connection
         $this->conn = new mysqli($host, $user, $pass, $db);
@@ -19,11 +21,19 @@ class SQLCompiler
         $this->user = $user;
         $this->pass = $pass;
         $this->db = $db;
+
+        //storing restricted sql sequences
+        $this->blacklist = $blacklist;
     }
     
     public function getConnectionData()
     {
         return [$this->host, $this->user, $this->pass, $this->db];
+    }
+
+    public function getBlacklist()
+    {
+        return $this->blacklist;
     }
     
     public function testConnection()
@@ -40,39 +50,62 @@ class SQLCompiler
         $result = $this->conn->query($query);
         return $result;
     }
+
+    protected function blacklistCheck($query)
+    {
+        foreach($this->blacklist as $blcmd)
+        {
+            //if query contains banned sequences
+            if(strpos(strtolower($query), strtolower($blcmd)) !== false)
+            {
+                return "Banned SQL - {$blcmd}";
+            }
+        }
+
+        return true;
+    }
     
     public function compile($query)
     {
         $result = null;
         
-        $response = $this->sendSQL($query);
-        
-        //checking if sql response is array or bool
-        if(is_bool($response))
+        $blacklistCheck = $this->blacklistCheck($query);
+
+        //checking for banned sql
+        if($blacklistCheck === true)
         {
-            //if request was to change db data
-            if($response)
+            $response = $this->sendSQL($query);
+        
+            //checking if sql response is array or bool
+            if(is_bool($response))
             {
-                $result = $response;
+                //if request was to change db data
+                if($response)
+                {
+                    $result = $response;
+                }
+                //if server returned error
+                else
+                {
+                    $result = "Error #".$this->conn->errno." - ".$this->conn->error;
+                }
+                
             }
-            //if server returned error
             else
             {
-                $result = "Error #".$this->conn->errno." - ".$this->conn->error;
+                //if request was to get db data
+                $result = [];
+                while($row = $response->fetch_array())
+                {
+                    array_push($result, $row);
+                }
             }
-            
-        }
-        else
-        {
-            //if request was to get db data
-            $result = [];
-            while($row = $response->fetch_array())
-            {
-                array_push($result, $row);
-            }
+
+            return $result;
         }
         
-        return $result;
+        //some commands were banned
+        return $blacklistCheck;
     }
 }
 
