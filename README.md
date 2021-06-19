@@ -36,7 +36,7 @@ $query = $_POST["query"];
 echo json_encode($sqlcompiler->compile($query));
 ```
 
-2. If you want to ban some words is requests:
+2. If you want to ban some words in requests:
 ```php
 //attaching composer`s autoload file
 require __DIR__.'/vendor/autoload.php';
