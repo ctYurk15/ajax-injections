@@ -7,20 +7,24 @@ class SQLCompiler
     protected $host;
     protected $db;
     protected $user;
+    protected $db_pass;
     protected $pass;
 
     protected $blacklist = [];
     
-    public function __construct($host, $user, $pass, $db, array $blacklist = [])
+    public function __construct($host, $user, $db_pass, $db, array $blacklist = [], $pass = null)
     {
         //initializing connection
-        $this->conn = new mysqli($host, $user, $pass, $db);
+        $this->conn = new mysqli($host, $user, $db_pass, $db);
         
         //storing connection data
         $this->host = $host;
         $this->user = $user;
-        $this->pass = $pass;
+        $this->db_pass = $db_pass;
         $this->db = $db;
+
+        //storing password
+        $this->pass = $pass;
 
         //storing restricted sql sequences
         $this->blacklist = $blacklist;
@@ -28,12 +32,17 @@ class SQLCompiler
     
     public function getConnectionData()
     {
-        return [$this->host, $this->user, $this->pass, $this->db];
+        return [$this->host, $this->user, $this->db_pass, $this->db];
     }
 
     public function getBlacklist()
     {
         return $this->blacklist;
+    }
+
+    public function getPass()
+    {
+        return $this->pass;
     }
     
     public function testConnection()
@@ -65,47 +74,51 @@ class SQLCompiler
         return true;
     }
     
-    public function compile($query)
+    public function compile($query, $pass = null)
     {
         $result = null;
-        
-        $blacklistCheck = $this->blacklistCheck($query);
 
-        //checking for banned sql
-        if($blacklistCheck === true)
+        if($this->pass == null || $this->pass == $pass) //if we don`t need password to access SQL or password was correct
         {
-            $response = $this->sendSQL($query);
-        
-            //checking if sql response is array or bool
-            if(is_bool($response))
+            $blacklistCheck = $this->blacklistCheck($query);
+
+            //checking for banned sql
+            if($blacklistCheck === true)
             {
-                //if request was to change db data
-                if($response)
+                $response = $this->sendSQL($query);
+            
+                //checking if sql response is array or bool
+                if(is_bool($response))
                 {
-                    $result = $response;
-                }
-                //if server returned error
-                else
-                {
-                    $result = "Error #".$this->conn->errno." - ".$this->conn->error;
+                    //if request was to change db data
+                    if($response)
+                    {
+                        return $response;
+                    }
+                    
+                    //if server returned error
+                    return "Error #".$this->conn->errno." - ".$this->conn->error;
+                    
                 }
                 
-            }
-            else
-            {
                 //if request was to get db data
                 $result = [];
+
                 while($row = $response->fetch_array())
                 {
                     array_push($result, $row);
                 }
-            }
 
-            return $result;
+                return $result;
+            
+            }
+            
+            //some commands were banned
+            return $blacklistCheck;
         }
         
-        //some commands were banned
-        return $blacklistCheck;
+        return "Sorry, your password is not matching";
+        
     }
 }
 
