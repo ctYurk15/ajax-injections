@@ -104,6 +104,7 @@ class SQLCompiler
                 //if request was to get db data
                 $result = [];
 
+                //preparing array
                 while($row = $response->fetch_array())
                 {
                     array_push($result, $row);
@@ -113,11 +114,18 @@ class SQLCompiler
             
             }
             
-            //some commands were banned
+            //show what was banned
             return $blacklistCheck;
         }
         
-        return "Sorry, your password is not matching";
+        if($pass != null)
+        {
+            return "Sorry, your password is not matching";
+        }
+        else
+        {
+            return "Your password is empty";
+        }
         
     }
 }
