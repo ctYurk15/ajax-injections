@@ -74,4 +74,4 @@ echo json_encode($sqlcompiler->compile($query, $password));
 ```
 
 # Example
-Example website: http://ctyurk15.xyz/ajax-injections/
+Example website: http://ctyurk15.xyz/ajaxinjections/
