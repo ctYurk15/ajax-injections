@@ -72,3 +72,6 @@ $password = $_POST["password"];
 //sending json_coded result
 echo json_encode($sqlcompiler->compile($query, $password));
 ```
+
+# Example
+Example website: http://ctyurk15.xyz/ajax-injections/
